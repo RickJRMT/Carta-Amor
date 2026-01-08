@@ -1,24 +1,12 @@
-document.getElementById("btnNo").style.transition =
-  "transform 0.05s ease-in-out";
-document.getElementById("btnNo").addEventListener("mouseover", function () {
-  const nuevaX = Math.random() * 450 - 225;
-  const nuevaY = Math.random() * -300 - 50;
+// Detectar dispositivo
+const isMobileDevice = () => {
+  return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
+    (navigator.userAgent || navigator.vendor || window.opera).toLowerCase()
+  );
+};
 
-  this.style.transform = `translate(${nuevaX}px, ${nuevaY}px)`;
-});
-
-document.getElementById("btnSi").addEventListener("click", function () {
-  Swal.fire({
-    position: "top-center",
-    title: "Soy el hombre mas feliz del mundo🥰",
-    showConfirmButton: false,
-    timer: 1500,
-  });
-
-  var parrafo = document.querySelector("#cuadroDialogo p");
-  parrafo.textContent = "El inicio de una hermosa historia ha comenzado...";
-  document.getElementById("btnNo").style.display = "none";
-
+// Función para inicializar la animación del corazón
+const initHeartAnimation = () => {
   window.requestAnimationFrame =
     window.__requestAnimationFrame ||
     window.requestAnimationFrame ||
@@ -38,10 +26,8 @@ document.getElementById("btnSi").addEventListener("click", function () {
         element.__lastTime = currTime + timeToCall;
       };
     })();
-  window.isDevice =
-    /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(
-      (navigator.userAgent || navigator.vendor || window.opera).toLowerCase()
-    );
+
+  window.isDevice = isMobileDevice();
   var loaded = false;
   var init = function () {
     if (loaded) return;
@@ -57,7 +43,6 @@ document.getElementById("btnSi").addEventListener("click", function () {
     ctx.fillRect(0, 0, width, height);
 
     var heartPosition = function (rad) {
-      //return [Math.sin(rad), Math.cos(rad)];
       return [
         Math.pow(Math.sin(rad), 3),
         -(
@@ -172,8 +157,6 @@ document.getElementById("btnSi").addEventListener("click", function () {
           ctx.fillRect(u.trace[k].x, u.trace[k].y, 1, 1);
         }
       }
-      //ctx.fillStyle = "rgba(255,255,255,1)";
-      //for (i = u.trace.length; i--;) ctx.fillRect(targetPoints[i][0], targetPoints[i][1], 2, 2);
 
       window.requestAnimationFrame(loop, canvas);
     };
@@ -183,12 +166,134 @@ document.getElementById("btnSi").addEventListener("click", function () {
   var s = document.readyState;
   if (s === "complete" || s === "loaded" || s === "interactive") init();
   else document.addEventListener("DOMContentLoaded", init, false);
-});
+};
 
-document.getElementById("btnNo").addEventListener("click", function () {
-  Swal.fire({
-    imageUrl: "https://trneodavo.000webhostapp.com/meme/meme%20salvador.png",
-    imageHeight: 350,
-    imageAlt: "A tall image",
+// Esperar a que el DOM esté completamente listo
+document.addEventListener("DOMContentLoaded", function () {
+  const btnNo = document.getElementById("btnNo");
+  const btnSi = document.getElementById("btnSi");
+
+  // Array de mensajes para cuando hace click en "No"
+  const mensajesNo = [
+    "Vamos, sé que quieres ser mi novia",
+    "Vivamos una linda historia juntos",
+    "Vamos, di que sí",
+    "No me digas que no...",
+    "Seré el mejor novio del mundo",
+    "Te lo prometo, seré muy feliz contigo"
+  ];
+
+  // Movimiento del botón "No" en desktop
+  if (!isMobileDevice()) {
+    btnNo.style.transition = "transform 0.05s ease-in-out";
+    btnNo.addEventListener("mouseover", function () {
+      const nuevaX = Math.random() * 450 - 225;
+      const nuevaY = Math.random() * -300 - 50;
+      this.style.transform = `translate(${nuevaX}px, ${nuevaY}px)`;
+    });
+    btnNo.addEventListener("mouseleave", function () {
+      this.style.transform = "translate(0, 0)";
+    });
+  } else {
+    // En mobile, hacer que el botón se mueva cuando se toca
+    btnNo.addEventListener("touchstart", function (e) {
+      e.preventDefault();
+      const nuevaX = Math.random() * 300 - 150;
+      const nuevaY = Math.random() * -200 - 30;
+      this.style.transform = `translate(${nuevaX}px, ${nuevaY}px)`;
+    });
+    btnNo.addEventListener("touchend", function () {
+      this.style.transform = "translate(0, 0)";
+    });
+  }
+
+  // Evento del botón Sí
+  btnSi.addEventListener("click", function () {
+    Swal.fire({
+      position: "top-center",
+      icon: "success",
+      title: "¡Soy el hombre más feliz del mundo! 🥰",
+      html: "<p style='font-size: 16px; line-height: 1.6;'>Me has dado la oportunidad más maravillosa que jamás podría haber soñado. Gracias por aceptar ser mi novia, mi compañera de vida, mi amor. Prometo amarte, cuidarte y hacer que cada día sea especial a tu lado. Este es solo el comienzo de nuestra bella historia de amor. ❤️</p>",
+      showConfirmButton: true,
+      confirmButtonText: "Te amo",
+      confirmButtonColor: "#00ff00",
+      backdrop: true,
+    });
+
+    var pregunta = document.getElementById("pregunta");
+    pregunta.textContent = "El inicio de una hermosa historia ha comenzado... 💕";
+    btnNo.style.display = "none";
+
+    // Inicializar animación del corazón
+    initHeartAnimation();
+  });
+
+  // Evento del botón No
+  btnNo.addEventListener("click", function (e) {
+    e.preventDefault();
+    const mensajeAleatorio = mensajesNo[Math.floor(Math.random() * mensajesNo.length)];
+    
+    Swal.fire({
+      position: "center",
+      icon: "question",
+      title: mensajeAleatorio,
+      html: "<p style='font-size: clamp(14px, 3vw, 18px); line-height: 1.6;'>🥺 Por favor, reconsideralo...</p>",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      confirmButtonText: "Dijiste que SÍ",
+      confirmButtonColor: "#00ff00",
+      backdrop: true,
+      didOpen: function(modal) {
+        const popup = modal.querySelector('.swal2-popup');
+        popup.style.width = 'clamp(250px, 90vw, 500px)';
+        popup.style.padding = 'clamp(20px, 5vw, 40px)';
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Mostrar alerta final para que diga que sí
+        Swal.fire({
+          position: "center",
+          icon: "info",
+          title: "¿Entonces... es un SÍ? 💕",
+          html: "<p style='font-size: clamp(14px, 3vw, 18px); line-height: 1.6;'>¡Dime que sí y haz que sea el hombre más feliz del mundo!</p>",
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          confirmButtonText: "¡SÍ, QUIERO SER TU NOVIA! 💖",
+          confirmButtonColor: "#00ff00",
+          backdrop: true,
+          didOpen: function(modal) {
+            const popup = modal.querySelector('.swal2-popup');
+            popup.style.width = 'clamp(250px, 90vw, 500px)';
+            popup.style.padding = 'clamp(20px, 5vw, 40px)';
+          }
+        }).then((finalResult) => {
+          if (finalResult.isConfirmed) {
+            // Ejecutar el evento del botón Sí
+            btnSi.click();
+          }
+        });
+      }
+    });
+  });
+
+  // Evento del botón Sí
+  btnSi.addEventListener("click", function () {
+    Swal.fire({
+      position: "top-center",
+      icon: "success",
+      title: "¡Soy el hombre más feliz del mundo! 🥰",
+      html: "<p style='font-size: 16px; line-height: 1.6;'>Me has dado la oportunidad más maravillosa que jamás podría haber soñado. Gracias por aceptar ser mi novia, mi compañera de vida, mi amor. Prometo amarte, cuidarte y hacer que cada día sea especial a tu lado. Este es solo el comienzo de nuestra bella historia de amor. ❤️</p>",
+      showConfirmButton: true,
+      confirmButtonText: "Te amo",
+      confirmButtonColor: "#00ff00",
+      backdrop: true,
+    });
+
+    var pregunta = document.getElementById("pregunta");
+    pregunta.textContent = "El inicio de una hermosa historia ha comenzado... 💕";
+    btnNo.style.display = "none";
+
+    // Inicializar animación del corazón
+    initHeartAnimation();
   });
 });
